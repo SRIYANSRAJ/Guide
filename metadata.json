@@ -1,0 +1,6 @@
+{
+  "name": "Number System Visual Master",
+  "description": "Interactive visual learning platform and step-by-step laboratory for Binary, Octal, Decimal, and Hexadecimal conversions, radix mathematics, slow-motion chain borrowing, and arithmetic operations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
