@@ -7,17 +7,15 @@ import {
   ChevronRight,
   ChevronLeft,
   Sparkles,
-  ArrowRight,
-  HelpCircle,
   Zap,
+  ArrowRight,
+  Info,
 } from 'lucide-react';
 import { BaseType } from '../types';
 import {
   BASES,
   isValidNumberString,
   generateChainBorrowSubtractionSteps,
-  charToValue,
-  valueToChar,
 } from '../utils/numberSystems';
 
 export const Chapter6Subtraction: React.FC = () => {
@@ -26,7 +24,7 @@ export const Chapter6Subtraction: React.FC = () => {
   const [numB, setNumB] = useState<string>('00001');
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [speedMs, setSpeedMs] = useState<number>(1500); // Ultra slow default
+  const [speedMs, setSpeedMs] = useState<number>(1800); // Very comfortable slow-motion speed
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -90,126 +88,135 @@ export const Chapter6Subtraction: React.FC = () => {
   const paddedB = numB.padStart(maxLen, '0');
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-8 sm:space-y-10 animate-fadeIn">
       {/* Title */}
-      <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
-        <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-rose-600 dark:text-rose-400 mb-1">
-          <Link2 className="w-4 h-4" /> Chapter 6 • Slow-Motion Animation Laboratory
+      <div className="border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-rose-600 dark:text-rose-400 mb-1.5">
+          <Link2 className="w-5 h-5" /> Chapter 6 • Slow-Motion Animation Laboratory
         </div>
-        <h2 className="text-3xl font-black text-slate-900 dark:text-white">
+        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
           Slow-Motion Chain Borrowing &amp; Strike-Through Simulator
         </h2>
-        <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-          Watch in slow motion how a borrow propagates left to find a non-zero donor, strikes through the donor, travels across consecutive zeroes (turning them into base − 1), and empowers the target column by +base!
+        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base mt-2 leading-relaxed">
+          Watch in slow motion how a borrow propagates left to find a non-zero donor, strikes through the donor, travels across consecutive zeroes (turning each into base − 1), and empowers the target column by +base!
         </p>
       </div>
 
       {/* Preset Buttons */}
-      <div className="flex flex-wrap gap-2">
-        <span className="text-xs font-bold text-slate-500 self-center mr-1">Presets:</span>
-        {presets.map((p, idx) => (
-          <button
-            key={idx}
-            onClick={() => {
-              setActiveBase(p.base);
-              setNumA(p.a);
-              setNumB(p.b);
-              setCurrentStepIndex(0);
-              setIsPlaying(false);
-            }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-              activeBase === p.base && numA === p.a && numB === p.b
-                ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-rose-400'
-            }`}
-          >
-            {p.label}
-          </button>
-        ))}
+      <div className="space-y-2">
+        <div className="text-xs font-black text-slate-500 uppercase tracking-wider">
+          Recommended Interactive Scenarios:
+        </div>
+        <div className="flex flex-wrap gap-2 sm:gap-2.5">
+          {presets.map((p, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                setActiveBase(p.base);
+                setNumA(p.a);
+                setNumB(p.b);
+                setCurrentStepIndex(0);
+                setIsPlaying(false);
+              }}
+              className={`px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-bold border transition-all active:scale-95 ${
+                activeBase === p.base && numA === p.a && numB === p.b
+                  ? 'bg-rose-600 text-white border-rose-600 shadow-md scale-102'
+                  : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-rose-400 hover:bg-rose-50/50'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Main Simulator Card */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-8 md:p-10 shadow-sm">
         {/* Top Control Bar: Base Selection, Speed Selection */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800 mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 pb-6 border-b border-slate-200 dark:border-slate-800 mb-8">
           {/* Base Selector */}
-          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
-            {([2, 8, 10, 16] as BaseType[]).map((b) => (
-              <button
-                key={b}
-                onClick={() => {
-                  setActiveBase(b);
-                  setCurrentStepIndex(0);
-                  setIsPlaying(false);
-                  if (b === 2) {
-                    setNumA('10000');
-                    setNumB('00001');
-                  } else if (b === 8) {
-                    setNumA('1000');
-                    setNumB('0007');
-                  } else if (b === 10) {
-                    setNumA('1000');
-                    setNumB('0001');
-                  } else {
-                    setNumA('1000');
-                    setNumB('000F');
-                  }
-                }}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${
-                  activeBase === b
-                    ? 'bg-rose-600 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                }`}
-              >
-                {BASES[b].name} ({b})
-              </button>
-            ))}
+          <div>
+            <span className="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">
+              Select Number Base:
+            </span>
+            <div className="flex flex-wrap items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+              {([2, 8, 10, 16] as BaseType[]).map((b) => (
+                <button
+                  key={b}
+                  onClick={() => {
+                    setActiveBase(b);
+                    setCurrentStepIndex(0);
+                    setIsPlaying(false);
+                    if (b === 2) {
+                      setNumA('10000');
+                      setNumB('00001');
+                    } else if (b === 8) {
+                      setNumA('1000');
+                      setNumB('0007');
+                    } else if (b === 10) {
+                      setNumA('1000');
+                      setNumB('0001');
+                    } else {
+                      setNumA('1000');
+                      setNumB('000F');
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-mono font-black transition-all ${
+                    activeBase === b
+                      ? 'bg-rose-600 text-white shadow-md'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                  }`}
+                >
+                  {BASES[b].name} ({b})
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Speed Selector */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Speed:
+          <div>
+            <span className="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">
+              Animation Speed:
             </span>
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs font-bold">
               <button
-                onClick={() => setSpeedMs(2200)}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  speedMs === 2200
-                    ? 'bg-rose-600 text-white font-bold'
+                onClick={() => setSpeedMs(2500)}
+                className={`px-3 py-1.5 rounded-xl transition-all ${
+                  speedMs === 2500
+                    ? 'bg-rose-600 text-white font-black shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                 }`}
               >
-                Ultra Slow (2.2s)
+                Ultra Slow (2.5s)
               </button>
               <button
-                onClick={() => setSpeedMs(1200)}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  speedMs === 1200
-                    ? 'bg-rose-600 text-white font-bold'
+                onClick={() => setSpeedMs(1400)}
+                className={`px-3 py-1.5 rounded-xl transition-all ${
+                  speedMs === 1400
+                    ? 'bg-rose-600 text-white font-black shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                 }`}
               >
-                Slow (1.2s)
+                Slow (1.4s)
               </button>
               <button
-                onClick={() => setSpeedMs(600)}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  speedMs === 600
-                    ? 'bg-rose-600 text-white font-bold'
+                onClick={() => setSpeedMs(700)}
+                className={`px-3 py-1.5 rounded-xl transition-all ${
+                  speedMs === 700
+                    ? 'bg-rose-600 text-white font-black shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                 }`}
               >
-                Normal (0.6s)
+                Normal (0.7s)
               </button>
             </div>
           </div>
         </div>
 
         {/* Custom Input Fields */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
           <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
+            <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-2">
               Minuend Top Number (Base {activeBase})
             </label>
             <input
@@ -220,11 +227,11 @@ export const Chapter6Subtraction: React.FC = () => {
                 setCurrentStepIndex(0);
                 setIsPlaying(false);
               }}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-mono font-bold text-lg text-slate-900 dark:text-white"
+              className="w-full px-5 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-mono font-black text-xl sm:text-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:outline-hidden"
             />
           </div>
           <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
+            <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-2">
               Subtrahend Bottom Number (Base {activeBase})
             </label>
             <input
@@ -235,82 +242,84 @@ export const Chapter6Subtraction: React.FC = () => {
                 setCurrentStepIndex(0);
                 setIsPlaying(false);
               }}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-mono font-bold text-lg text-slate-900 dark:text-white"
+              className="w-full px-5 py-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-mono font-black text-xl sm:text-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:outline-hidden"
             />
           </div>
         </div>
 
         {/* Playback Control Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 mb-8">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 mb-8">
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => setIsPlaying(!isPlaying)}
-              className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm transition-all ${
+              className={`px-6 py-3 rounded-2xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all active:scale-95 ${
                 isPlaying
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-rose-600 hover:bg-rose-500 text-white'
+                  ? 'bg-amber-500 text-white hover:bg-amber-600'
+                  : 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-600/30'
               }`}
             >
-              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              {isPlaying ? 'Pause Simulation' : 'Play Slow-Mo Animation'}
+              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              {isPlaying ? 'Pause Simulation' : 'Play Slow-Mo'}
             </button>
             <button
               onClick={handlePrev}
               disabled={currentStepIndex === 0}
-              className="p-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-white disabled:opacity-30 hover:bg-slate-300"
+              className="p-3 rounded-2xl bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white disabled:opacity-30 hover:bg-slate-300 active:scale-95 transition-all"
               title="Previous Step"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={handleNext}
               disabled={currentStepIndex >= steps.length - 1}
-              className="px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white font-bold text-xs flex items-center gap-1 disabled:opacity-30 hover:bg-slate-300"
+              className="px-5 py-3 rounded-2xl bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white font-black text-xs sm:text-sm flex items-center gap-1.5 disabled:opacity-30 hover:bg-slate-300 active:scale-95 transition-all"
             >
-              Next Step <ChevronRight className="w-4 h-4" />
+              Next Step <ChevronRight className="w-5 h-5" />
             </button>
             <button
               onClick={handleReset}
-              className="p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:text-slate-900"
-              title="Reset"
+              className="p-3 rounded-2xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:text-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all"
+              title="Reset to Step 1"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="text-xs font-mono font-bold text-slate-500">
-            Step {currentStepIndex + 1} / {steps.length}
+          <div className="text-xs sm:text-sm font-mono font-black px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+            Step {currentStepIndex + 1} of {steps.length}
           </div>
         </div>
 
         {/* Live Step Explanation Callout */}
         {currentStep && (
           <div
-            className={`p-4 rounded-2xl border text-xs sm:text-sm font-mono mb-8 flex items-start gap-3 transition-all duration-300 ${
+            className={`p-5 sm:p-6 rounded-3xl border-2 text-sm sm:text-base font-mono mb-10 flex items-start gap-4 transition-all duration-300 shadow-md ${
               currentStep.actionType === 'strike_source'
-                ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-950 dark:text-rose-200'
+                ? 'bg-rose-50 dark:bg-rose-950/50 border-rose-400 dark:border-rose-700 text-rose-950 dark:text-rose-100'
                 : currentStep.actionType === 'strike_intermediate'
-                ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-950 dark:text-amber-200'
+                ? 'bg-amber-50 dark:bg-amber-950/50 border-amber-400 dark:border-amber-700 text-amber-950 dark:text-amber-100'
                 : currentStep.actionType === 'transfer_target'
-                ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-800 text-indigo-950 dark:text-indigo-200'
+                ? 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-400 dark:border-indigo-700 text-indigo-950 dark:text-indigo-100'
                 : currentStep.actionType === 'subtract'
-                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200'
-                : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
+                ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-400 dark:border-emerald-700 text-emerald-950 dark:text-emerald-100'
+                : 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100'
             }`}
           >
-            <Zap className="w-5 h-5 shrink-0 mt-0.5 text-rose-500" />
+            <div className="w-9 h-9 rounded-2xl bg-rose-500/20 text-rose-600 flex items-center justify-center shrink-0 mt-0.5">
+              <Zap className="w-5 h-5" />
+            </div>
             <div>
-              <div className="font-extrabold uppercase tracking-wider text-[11px] opacity-80 mb-1">
-                Action: {currentStep.actionType.replace('_', ' ').toUpperCase()}
+              <div className="font-black uppercase tracking-wider text-xs sm:text-sm opacity-90 mb-1 flex items-center gap-2">
+                <span>Action: {currentStep.actionType.replace('_', ' ').toUpperCase()}</span>
               </div>
-              <p className="leading-relaxed font-semibold">{currentStep.explanation}</p>
+              <p className="leading-relaxed font-bold">{currentStep.explanation}</p>
             </div>
           </div>
         )}
 
         {/* VISUAL STRIKE-THROUGH AND BORROW ARROW COLUMNS */}
-        <div className="overflow-x-auto py-6">
-          <div className="flex items-end justify-center gap-3 sm:gap-5 min-w-max">
+        <div className="overflow-x-auto py-6 px-2 bg-slate-50/50 dark:bg-slate-950/40 rounded-3xl border border-slate-200 dark:border-slate-800">
+          <div className="flex items-end justify-center gap-3 sm:gap-6 min-w-max px-4">
             {Array.from({ length: maxLen }).map((_, colOffset) => {
               const charIdx = colOffset;
               const colPower = maxLen - 1 - charIdx;
@@ -321,29 +330,25 @@ export const Chapter6Subtraction: React.FC = () => {
               const strikethroughInfo = currentStep?.strikethroughs[colPower];
               const isStrikethrough = !!strikethroughInfo;
 
-              const intermediateVal = currentStep?.intermediateValues[colPower];
               const resultDigit = currentStep?.resultDigits[colPower];
               const isActiveColumn = currentStep?.activeCol === colPower;
-
-              const isArrowOrigin = currentStep?.arrowActive?.from === colPower;
-              const isArrowTarget = currentStep?.arrowActive?.to === colPower;
 
               return (
                 <div
                   key={colOffset}
-                  className={`relative flex flex-col items-center p-3 sm:p-4 rounded-3xl border-2 transition-all duration-300 ${
+                  className={`relative flex flex-col items-center p-4 sm:p-6 rounded-3xl border-2 min-w-[5rem] sm:min-w-[6.5rem] transition-all duration-300 ${
                     isActiveColumn
-                      ? 'border-rose-500 bg-rose-50/60 dark:bg-rose-950/30 shadow-lg scale-105'
+                      ? 'border-rose-500 bg-rose-50/90 dark:bg-rose-950/50 shadow-xl scale-108 z-10'
                       : isStrikethrough
-                      ? 'border-amber-300 dark:border-amber-700/60 bg-amber-50/30 dark:bg-amber-950/20'
+                      ? 'border-amber-400 dark:border-amber-600/70 bg-amber-50/50 dark:bg-amber-950/30'
                       : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'
                   }`}
                 >
                   {/* TOP BADGE: NEW REVISED VALUE AFTER STRIKE */}
-                  <div className="h-8 flex items-center justify-center mb-1">
+                  <div className="h-10 flex items-center justify-center mb-2">
                     {isStrikethrough && (
                       <div
-                        className={`text-xs font-mono font-black px-2 py-0.5 rounded-md border shadow-xs animate-bounce ${
+                        className={`text-xs sm:text-sm font-mono font-black px-3 py-1 rounded-xl border-2 shadow-sm animate-bounce ${
                           strikethroughInfo.stage === 'source'
                             ? 'bg-rose-500 text-white border-rose-600'
                             : strikethroughInfo.stage === 'path'
@@ -357,11 +362,11 @@ export const Chapter6Subtraction: React.FC = () => {
                   </div>
 
                   {/* MINUEND DIGIT (A) with strike line */}
-                  <div className="relative font-mono font-black text-3xl sm:text-4xl text-slate-900 dark:text-white">
+                  <div className="relative font-mono font-black text-4xl sm:text-6xl text-slate-900 dark:text-white">
                     <span
                       className={`inline-block transition-all ${
                         isStrikethrough
-                          ? 'line-through text-slate-400 dark:text-slate-500 decoration-rose-500 decoration-4'
+                          ? 'line-through text-slate-400 dark:text-slate-500 decoration-rose-600 decoration-[5px] sm:decoration-[7px]'
                           : ''
                       }`}
                     >
@@ -370,17 +375,17 @@ export const Chapter6Subtraction: React.FC = () => {
                   </div>
 
                   {/* SUBTRAHEND DIGIT (B) */}
-                  <div className="font-mono font-black text-3xl sm:text-4xl text-slate-700 dark:text-slate-300 my-2">
+                  <div className="font-mono font-black text-4xl sm:text-6xl text-slate-700 dark:text-slate-300 my-3">
                     {origDigitB}
                   </div>
 
-                  <div className="w-full border-t-2 border-slate-900 dark:border-slate-200 my-1" />
+                  <div className="w-full border-t-3 border-slate-900 dark:border-slate-100 my-2" />
 
                   {/* RESULT DIFFERENCE DIGIT */}
                   <div
-                    className={`font-mono font-black text-3xl sm:text-4xl mt-1 h-10 flex items-center justify-center ${
+                    className={`font-mono font-black text-4xl sm:text-6xl mt-1 h-14 flex items-center justify-center ${
                       resultDigit
-                        ? 'text-emerald-600 dark:text-emerald-400 scale-110'
+                        ? 'text-emerald-600 dark:text-emerald-400 scale-115 animate-fadeIn'
                         : 'text-slate-300 dark:text-slate-700'
                     }`}
                   >
@@ -388,7 +393,7 @@ export const Chapter6Subtraction: React.FC = () => {
                   </div>
 
                   {/* Position Weight */}
-                  <div className="text-[10px] font-mono text-slate-400 mt-2 font-bold">
+                  <div className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-3 font-black">
                     {activeBase}
                     <sup>{colPower}</sup>
                   </div>
@@ -399,18 +404,18 @@ export const Chapter6Subtraction: React.FC = () => {
         </div>
 
         {/* Step-by-Step Rule Box */}
-        <div className="mt-8 p-5 rounded-2xl bg-slate-900 text-slate-100 text-xs leading-relaxed space-y-2 border border-slate-800">
-          <div className="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-1">
-            Golden Rules of Positional Borrowing (All Bases):
+        <div className="mt-10 p-6 sm:p-8 rounded-3xl bg-slate-900 text-slate-100 text-sm leading-relaxed space-y-3 border border-slate-800 shadow-lg">
+          <div className="text-xs font-black text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+            <Info className="w-4 h-4" /> Golden Rules of Positional Borrowing (All Bases):
           </div>
           <p>
-            • <strong>When Top &lt; Bottom</strong>: You must borrow 1 group from the nearest non-zero column to the left.
+            • <strong>When Top &lt; Bottom</strong>: You must borrow 1 unit from the nearest non-zero column to the left.
           </p>
           <p>
             • <strong>Strike Donor</strong>: The donor digit drops by 1 (e.g. 1 ➔ 0, 3 ➔ 2).
           </p>
           <p>
-            • <strong>Intermediate Zeroes</strong>: Each zero in between becomes (base − 1) because it receives base and immediately passes 1 to the next right position!
+            • <strong>Intermediate Zeroes</strong>: Each zero in between becomes (base − 1) because it receives base and immediately passes 1 group of base to the next position to its right!
           </p>
           <p>
             • <strong>Target Arrival</strong>: The target column receives exactly +base units (+2 in Binary, +8 in Octal, +10 in Decimal, +16 in Hex).
