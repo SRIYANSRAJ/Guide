@@ -24,18 +24,27 @@ Crafted by **Sriyans And Devashish**.
 
 ## 🌐 Deploying to GitHub Pages
 
-This repository is pre-configured for GitHub Pages in two easy ways:
+This repository is pre-configured with a dual-mode workflow that works seamlessly with GitHub Pages.
 
-### Option 1: Automated GitHub Actions (Recommended)
-1. Push this repository to GitHub.
-2. In your GitHub repository, go to **Settings** > **Pages**.
-3. Under **Build and deployment** > **Source**, select **GitHub Actions**.
-4. Push to `main` (or trigger the workflow under the **Actions** tab), and GitHub will automatically build and publish your app.
+### Step 1: Enable Workflow Permissions in your GitHub Repo (Required)
+If GitHub Actions fails with permission or 403 errors:
+1. Go to your GitHub repository **Settings** → **Actions** → **General**.
+2. Scroll down to **Workflow permissions**.
+3. Select **"Read and write permissions"** and check **"Allow GitHub Actions to create and approve pull requests"**.
+4. Click **Save**.
 
-### Option 2: Deploy via CLI (`gh-pages`)
-1. Run the deploy script:
-   ```bash
-   npm run deploy
-   ```
-2. In your GitHub repository, go to **Settings** > **Pages**.
-3. Set the branch to `gh-pages` / `/ (root)`.
+### Step 2: Choose your GitHub Pages Setting
+In your GitHub repo, go to **Settings** → **Pages**:
+- **Option A (GitHub Actions)**: Under *Build and deployment* > *Source*, select **GitHub Actions**.
+- **Option B (Deploy from branch)**: Under *Build and deployment* > *Source*, select **Deploy from a branch** → choose branch **`gh-pages`** and folder **`/ (root)`**.
+
+The automated workflow supports **both** options out of the box!
+
+---
+
+### Alternative: Deploy directly via CLI (`npm run deploy`)
+You can also deploy locally without GitHub Actions:
+```bash
+npm run deploy
+```
+This automatically compiles the TypeScript project into `./dist` and pushes it to the `gh-pages` branch.
